@@ -5,6 +5,8 @@
 
 var UserSchema = require('../models/Schema/user');
 var md5 = require('../config/md5');
+var LoginSession = {}
+var RegisterSession = {}
 /**
  * 执行登陆
  */
@@ -29,8 +31,8 @@ exports.doLogin = function (req, res, next) {
                 // 判断用户名密码是否匹配
                 if (Password == result[0].Password) {
 
-                    req.session.user_id = result[0].user_id;
-                    req.session.login = 1;
+                    LoginSession.user_id = result[0].user_id;
+                    LoginSession.login = 1;
 
                     res.json({
                         "state_code": 200,
@@ -70,8 +72,10 @@ exports.getMsg = function (req, res, next) {
         if (result == '') {
 
             // 将验证码和手机存入session
-            req.session.PhoneNumber = PhoneNumber;
-            req.session.testNumber = testNumber;
+            RegisterSession.PhoneNumber = PhoneNumber;
+            RegisterSession.testNumber = testNumber;
+
+            console.log(RegisterSession)
 
             res.json({
                 "testNumber": testNumber,
@@ -96,12 +100,11 @@ exports.getMsg = function (req, res, next) {
  */
 exports.doRegister = function (req, res, next) {
 
-
     var PhoneNumber = req.body.PhoneNumber;
     var Password = md5(req.body.Password);
     var testNumber = req.body.testNumber;
-    var SPhoneNumber = req.session.PhoneNumber;
-    var StestNumber = req.session.testNumber;
+    var SPhoneNumber = RegisterSession.PhoneNumber;
+    var StestNumber = RegisterSession.testNumber;
 
     if (PhoneNumber === SPhoneNumber && testNumber === StestNumber) {
 
@@ -116,6 +119,8 @@ exports.doRegister = function (req, res, next) {
             "code": 1,
             "depict": "注册成功"
         })
+
+        RegisterSession = {}
 
     } else {
         res.json({
@@ -133,7 +138,7 @@ exports.doRegister = function (req, res, next) {
  */
 exports.doCancle = function (req, res, next) {
 
-    req.session.login = 0;
+    LoginSession.login = null;
     res.json({
         "state_code": 200,
         "code": 1,

@@ -10,6 +10,8 @@ var session = require('express-session');
 // 引入connect-mongo用于express连接数据库存储session
 var mongoStore = require('connect-mongo')(session);
 
+
+
 app.use(session({
   //参数配置
   secret: 'luckystar',//加密字符串 
@@ -29,7 +31,7 @@ app.use(session({
 app.use(express.json());
 
 // 启动路由表
-let route = require('./router');
+var route = require('./router');
 app.use(route);
 
 // 界面渲染

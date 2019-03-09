@@ -8,10 +8,10 @@ var UserSchema = require('../models/Schema/user')
  * 主界面
  */
 exports.index = function (req, res, next) {
-  if (req.session.login === "1") {
+  if (LoginSession.login === "1") {
 
     // 如果登陆了
-    var user_id = req.session.user_id;
+    var user_id = LoginSession.user_id;
     UserSchema.find({ "_id": user_id }, function () {
 
       var Nickname = result[0].Nickname;
@@ -57,9 +57,9 @@ exports.index = function (req, res, next) {
 exports.login = function (req, res, next) {
 
   // 如果已经登陆的话，将登陆者信息重新传回主界面
-  if (req.session.login === "1") {
+  if (LoginSession.login === "1") {
 
-    var user_id = req.session.user_id;
+    var user_id = LoginSession.user_id;
     UserSchema.find({ "_id": user_id }, function (err, result) {
 
       var Nickname = result[0].Nickname;
@@ -101,9 +101,9 @@ exports.login = function (req, res, next) {
 exports.register = function (req, res, next) {
 
   // 如果已经登陆的话，将登陆者信息重新传回主界面
-  if (req.session.login === "1") {
+  if (LoginSession.login === "1") {
 
-    var user_id = req.session.user_id;
+    var user_id = LoginSession.user_id;
     UserSchema.find({ "_id": user_id }, function (err, result) {
 
       var Nickname = result[0].Nickname;
