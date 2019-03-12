@@ -9,6 +9,7 @@ var express = require('express');
 var router = express.Router();
 var contorl = require('./dbhelper/db');
 
+
 // 显示主界面
 router.get('/', route.index);
 // 显示登陆界面

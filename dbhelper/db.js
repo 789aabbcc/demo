@@ -2,22 +2,23 @@
  * 业务逻辑的操作
  */
 
+// !!!一定要看清楚数据类型，有时候报错是因为前端和后台数据类型不一样而导致的报错
 
 var UserSchema = require('../models/Schema/user');
 var md5 = require('../config/md5');
-var LoginSession = {}
-var RegisterSession = {}
+var session = require('../config/session');
+var uuid = require('uuidv4')
 /**
  * 执行登陆
  */
 
 exports.doLogin = function (req, res, next) {
 
-
     var PhoneNumber = req.body.PhoneNumber;
     var Password = md5(req.body.Password);
 
     UserSchema.find({ "PhoneNumber": PhoneNumber }, function (err, result) {
+        console.log(result)
         // 先看有没有这个人
         if (result == '') {
             res.json({
@@ -31,10 +32,15 @@ exports.doLogin = function (req, res, next) {
                 // 判断用户名密码是否匹配
                 if (Password == result[0].Password) {
 
-                    LoginSession.user_id = result[0].user_id;
-                    LoginSession.login = 1;
+                    var access_token = uuid();
 
+                    // 将过期时间和 user_id 存入session
+                    session[access_token] = {
+                        user_id: result[0].user_id,
+                        expire_in: new Date().getTime() + 1000 * 60 * 60
+                    }
                     res.json({
+                        access_token,
                         "state_code": 200,
                         "code": 1,
                         "depict": "登陆成功"
@@ -72,12 +78,15 @@ exports.getMsg = function (req, res, next) {
         if (result == '') {
 
             // 将验证码和手机存入session
-            RegisterSession.PhoneNumber = PhoneNumber;
-            RegisterSession.testNumber = testNumber;
-
-            console.log(RegisterSession)
+            var access_token = uuid();
+            session[access_token] = {
+                PhoneNumber: PhoneNumber,
+                testNumber: testNumber.toString(),
+                expire_in: new Date().getTime() + 1000 * 60 * 60
+            }
 
             res.json({
+                access_token,
                 "testNumber": testNumber,
                 "state_code": 200,
                 "code": 1,
@@ -103,24 +112,38 @@ exports.doRegister = function (req, res, next) {
     var PhoneNumber = req.body.PhoneNumber;
     var Password = md5(req.body.Password);
     var testNumber = req.body.testNumber;
-    var SPhoneNumber = RegisterSession.PhoneNumber;
-    var StestNumber = RegisterSession.testNumber;
+
+    var SPhoneNumber = req.user_info.PhoneNumber;
+    var StestNumber = req.user_info.testNumber;
 
     if (PhoneNumber === SPhoneNumber && testNumber === StestNumber) {
 
+        var user_id = uuid().replace(/-/g, '');
         var user = new UserSchema({
+            user_id,
             PhoneNumber: PhoneNumber,
             Password: Password,
             State: 1
         });
         user.save();
+
+        // 将手机号和验证码的session删除
+        req.user_info = {}
+
+        var access_token = uuid();
+        session[access_token] = {
+            user_id,
+            expire_in: new Date().getTime() + 1000 * 60 * 60
+        }
+
         res.json({
+            access_token,
             "state_code": 200,
             "code": 1,
             "depict": "注册成功"
         })
 
-        RegisterSession = {}
+
 
     } else {
         res.json({
@@ -138,7 +161,7 @@ exports.doRegister = function (req, res, next) {
  */
 exports.doCancle = function (req, res, next) {
 
-    LoginSession.login = null;
+    req.user_info = {};
     res.json({
         "state_code": 200,
         "code": 1,

@@ -4,6 +4,10 @@ var Schema = mongoose.Schema; //和数据库一一映射的桥梁
 
 var userSchema = Schema
     ({
+        user_id: {
+            type: String,
+            default: null
+        },
         //定义用户数据字段
         Nickname: {
             type: String,
@@ -18,7 +22,7 @@ var userSchema = Schema
             default: null
         },
         PhoneNumber: {
-            type: Number,
+            type: String,
             default: null
         },
         Created_At: {
