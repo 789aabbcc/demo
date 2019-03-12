@@ -10,7 +10,7 @@ var UserSchema = require('../models/Schema/user')
 exports.index = function (req, res, next) {
 
   var user_id = req.user_info.user_id;
-  UserSchema.find({ "_id": user_id }, function () {
+  UserSchema.find({ "user_id": user_id }, function () {
 
     var Nickname = result[0].Nickname;
     var Avatar = result[0].Avatar;
@@ -38,7 +38,7 @@ exports.index = function (req, res, next) {
 exports.login = function (req, res, next) {
 
   var user_id = req.user_info.user_id;
-  UserSchema.find({ "_id": user_id }, function (err, result) {
+  UserSchema.find({ "user_id": user_id }, function (err, result) {
 
     var Nickname = result[0].Nickname;
     var Avatar = result[0].Avatar;
@@ -67,7 +67,7 @@ exports.register = function (req, res, next) {
   // 如果已经登陆的话，将登陆者信息重新传回主界面
 
   var user_id = req.user_info.user_id;
-  UserSchema.find({ "_id": user_id }, function (err, result) {
+  UserSchema.find({ "user_id": user_id }, function (err, result) {
 
     var Nickname = result[0].Nickname;
     var Avatar = result[0].Avatar;
