@@ -161,7 +161,7 @@ exports.doRegister = function (req, res, next) {
  */
 exports.doCancle = function (req, res, next) {
 
-    req.user_info = {};
+    req.user_info.expire_in = 0;
     res.json({
         "state_code": 200,
         "code": 1,
